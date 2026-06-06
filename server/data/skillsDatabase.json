@@ -1,0 +1,7 @@
+{
+  "frontend developer": ["react","javascript","html","css","tailwind","redux","typescript","next.js","vite","webpack"],
+  "backend developer": ["node.js","express","mongodb","sql","postgres","mysql","redis","docker","kubernetes","jwt"],
+  "fullstack developer": ["react","node.js","express","mongodb","sql","docker","typescript","rest api"],
+  "data analyst": ["python","sql","pandas","numpy","excel","power bi","tableau"],
+  "ai engineer": ["python","tensorflow","pytorch","machine learning","nlp","deep learning"]
+}

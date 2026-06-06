@@ -1,0 +1,7 @@
+{
+  "frontend developer": ["React","JavaScript","HTML","CSS","Tailwind","Redux","REST API","TypeScript"],
+  "backend developer": ["Node.js","Express","MongoDB","SQL","Authentication","API Design","Docker"],
+  "fullstack developer": ["React","Node.js","Express","MongoDB","Docker","TypeScript","REST API"],
+  "data analyst": ["Python","SQL","Pandas","Statistics","Data Visualization"],
+  "ai engineer": ["Python","Machine Learning","NLP","TensorFlow","PyTorch"]
+}
