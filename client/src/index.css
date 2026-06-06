@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark Mode Variables (Default) */
+  --bg-primary: #030014;
+  --bg-secondary: rgba(10, 12, 30, 0.55);
+  --bg-glass: rgba(10, 12, 30, 0.45);
+  --bg-glass-hover: rgba(15, 18, 40, 0.65);
+  --border-glass: rgba(255, 255, 255, 0.06);
+  --border-glass-hover: rgba(255, 255, 255, 0.12);
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --glow-color-1: rgba(99, 102, 241, 0.15);
+  --glow-color-2: rgba(236, 72, 153, 0.06);
+  --glow-color-3: rgba(59, 130, 246, 0.06);
+  --card-shadow: rgba(0, 0, 0, 0.45);
+}
+
+:root.light {
+  /* Light Mode Variables */
+  --bg-primary: #f8fafc;
+  --bg-secondary: rgba(241, 245, 249, 0.85);
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --bg-glass-hover: rgba(255, 255, 255, 0.9);
+  --border-glass: rgba(99, 102, 241, 0.09);
+  --border-glass-hover: rgba(99, 102, 241, 0.18);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --glow-color-1: rgba(99, 102, 241, 0.08);
+  --glow-color-2: rgba(236, 72, 153, 0.03);
+  --glow-color-3: rgba(59, 130, 246, 0.03);
+  --card-shadow: rgba(99, 102, 241, 0.05);
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+/* Glassmorphism Styles */
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 10px 30px var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.glass-panel-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-panel-hover:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-glass-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px var(--card-shadow);
+}
+
+/* Custom animated gradient backgrounds */
+.bg-gradient-glow {
+  background: radial-gradient(circle at 50% -20%, var(--glow-color-1), transparent 75%),
+              radial-gradient(circle at 10% 80%, var(--glow-color-2), transparent 55%),
+              radial-gradient(circle at 90% 80%, var(--glow-color-3), transparent 55%);
+  transition: background 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+/* Motion Graphic Keyframes */
+@keyframes scanLines {
+  0% { transform: translateY(0); opacity: 0.8; }
+  50% { transform: translateY(180px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 0.8; }
+}
+
+@keyframes radarSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes soundWave {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1.1); }
+}
+
+@keyframes floatNode {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-8px) scale(1.03); }
+}
+
+.animate-laser-scan {
+  animation: scanLines 4s infinite linear;
+}
+
+.animate-radar-spin {
+  animation: radarSpin 20s infinite linear;
+}
+
+.animate-soundwave-1 { animation: soundWave 1.2s infinite ease-in-out; }
+.animate-soundwave-2 { animation: soundWave 0.8s infinite ease-in-out 0.2s; }
+.animate-soundwave-3 { animation: soundWave 1.4s infinite ease-in-out 0.4s; }
+.animate-soundwave-4 { animation: soundWave 1s infinite ease-in-out 0.1s; }
+.animate-soundwave-5 { animation: soundWave 1.3s infinite ease-in-out 0.3s; }
+
+.animate-float-node {
+  animation: floatNode 6s infinite ease-in-out;
+}

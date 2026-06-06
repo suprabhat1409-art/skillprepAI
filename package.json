@@ -1,12 +1,23 @@
 {
-  "name": "skillprep-ai",
+  "name": "skillprep-ai-agent",
   "private": true,
   "version": "0.1.0",
-  "workspaces": ["backend", "frontend"],
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "start:backend": "npm --workspace backend run start",
-    "dev:backend": "npm --workspace backend run dev",
-    "start:frontend": "npm --workspace frontend run dev",
+    "dev:client": "npm --workspace client run dev",
+    "dev:server": "npm --workspace server run dev",
+    "start:client": "npm --workspace client run dev",
+    "start:server": "npm --workspace server run start",
     "install:all": "npm install"
+  },
+  "dependencies": {
+    "@azure/openai": "^2.0.0",
+    "bottleneck": "^2.19.5",
+    "dotenv": "^17.4.2",
+    "newman": "^6.2.2",
+    "node-cache": "^5.1.2"
   }
 }

@@ -1,0 +1,117 @@
+{
+  "info": {
+    "_postman_id": "00000000-0000-0000-0000-000000000000",
+    "name": "SkillPrep AI API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/ping", "host": ["{{baseUrl}}"], "path": ["api", "ping"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"{{userName}}\",\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"skills\": [\"React\", \"Node.js\"],\n  \"targetRole\": \"{{targetRole}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+          ,
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.environment.set('authToken', json.token);",
+                  "}",
+                  "if (json && json.user && json.user.id) {",
+                  "  pm.environment.set('userId', json.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Resume",
+      "item": [
+        {
+          "name": "Upload Resume",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{authToken}}" } ],
+            "body": { "mode": "formdata", "formdata": [ { "key": "resume", "type": "file", "src": "docs/postman/test-resume.pdf" }, { "key": "userId", "value": "{{userId}}", "type": "text" } ] },
+            "url": { "raw": "{{baseUrl}}/api/resume/upload", "host": ["{{baseUrl}}"], "path": ["api", "resume", "upload"] }
+          }
+          ,
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json && json.resume && json.resume.id) {",
+                  "  pm.environment.set('resumeId', json.resume.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Resume By User",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{authToken}}" } ], "url": { "raw": "{{baseUrl}}/api/resume/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "resume", "{{userId}}"] } }
+        },
+        {
+          "name": "Delete Resume By Id",
+          "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{authToken}}" } ], "url": { "raw": "{{baseUrl}}/api/resume/{{resumeId}}", "host": ["{{baseUrl}}"], "path": ["api", "resume", "{{resumeId}}"] } }
+        }
+      ]
+    },
+    {
+      "name": "Agents",
+      "item": [
+        {
+          "name": "Analyze Resume",
+          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"resumeText\": \"Experienced React and Node.js developer with MongoDB background.\"\n}" }, "url": { "raw": "{{baseUrl}}/api/agents/analyze-resume", "host": ["{{baseUrl}}"], "path": ["api", "agents", "analyze-resume"] } }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "userName", "value": "Test User" },
+    { "key": "userEmail", "value": "test.user@example.com" },
+    { "key": "userPassword", "value": "Password123!" },
+    { "key": "targetRole", "value": "Frontend Developer" },
+    { "key": "authToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "resumeId", "value": "" }
+  ]
+}
