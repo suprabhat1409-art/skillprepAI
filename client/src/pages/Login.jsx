@@ -6,6 +6,7 @@ import { authAPI } from '../services/api';
 import GlassCard from '../components/GlassCard';
 import { Spinner } from '../components/Loaders';
 import { Mail, Lock, LogIn, ArrowLeft } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
   const { loginState } = useAuth();
@@ -25,7 +26,6 @@ const Login = () => {
       showNotification('Please fill in all fields', 'warning');
       return;
     }
-
     setLoading(true);
     try {
       const res = await authAPI.login(formData);
@@ -41,11 +41,27 @@ const Login = () => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await authAPI.googleLogin(credentialResponse.credential);
+      loginState(res.data);
+      showNotification('Signed in with Google! 🎉', 'success');
+      navigate('/dashboard');
+    } catch (error) {
+      console.error(error);
+      showNotification('Google sign-in failed. Please try again.', 'error');
+    }
+  };
+
+  const handleGoogleError = () => {
+    showNotification('Google sign-in was cancelled or failed.', 'error');
+  };
+
   return (
     <div className="min-h-screen bg-[#030014] text-slate-100 bg-gradient-glow flex items-center justify-center p-4 relative overflow-hidden">
       {/* Back button */}
-      <Link 
-        to="/" 
+      <Link
+        to="/"
         className="absolute top-6 left-6 flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-semibold"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -90,9 +106,7 @@ const Login = () => {
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <div className="flex justify-between items-center">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Password</label>
-              </div>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <Lock className="w-5 h-5" />
@@ -123,6 +137,26 @@ const Login = () => {
               )}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-slate-800"></div>
+            <span className="text-xs text-slate-500 font-medium">or continue with</span>
+            <div className="flex-1 h-px bg-slate-800"></div>
+          </div>
+
+          {/* Google Login Button */}
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              theme="filled_black"
+              shape="rectangular"
+              size="large"
+              text="signin_with"
+              width="360"
+            />
+          </div>
 
           {/* Bottom redirection */}
           <div className="mt-8 text-center pt-6 border-t border-slate-900 text-sm">

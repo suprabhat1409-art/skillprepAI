@@ -42,21 +42,49 @@ async function prepareInterviewKit({ targetRole = '', skills = [], level = 'mid'
   const raw = await chat([system, user]);
   const parsed = tryParseJsonMaybe(raw);
   if (parsed) {
+    // Create fallback pieces to merge
+    const coreSkills = Array.isArray(skills) && skills.length ? skills.slice(0,5) : ['JavaScript','Data Structures','APIs'];
+    const techQsFallback = [];
+    coreSkills.forEach((s, idx) => {
+      const difficulty = idx < 2 ? 'easy' : (idx < 4 ? 'medium' : 'hard');
+      techQsFallback.push({ question: `Explain core concepts and common interview problems for ${s}.`, difficulty });
+    });
+    const hrQsFallback = [
+      'Tell me about yourself and why you are interested in this role.',
+      'Describe a challenge you faced and how you resolved it.'
+    ];
+    const difficultyBreakdownFallback = { easy: 2, medium: 2, hard: Math.max(0, techQsFallback.length - 4) };
+
     return {
-      technicalQuestions: Array.isArray(parsed.technicalQuestions) ? parsed.technicalQuestions : [],
-      hrQuestions: Array.isArray(parsed.hrQuestions) ? parsed.hrQuestions : [],
-      feedback: typeof parsed.feedback === 'string' ? parsed.feedback : String(parsed.feedback || ''),
-      difficultyBreakdown: (parsed.difficultyBreakdown && typeof parsed.difficultyBreakdown === 'object') ? parsed.difficultyBreakdown : { easy: 0, medium: 0, hard: 0 },
-      confidence: Number.isFinite(parsed.confidence) ? Math.max(0, Math.min(100, Number(parsed.confidence))) : 0
+      technicalQuestions: Array.isArray(parsed.technicalQuestions) && parsed.technicalQuestions.length ? parsed.technicalQuestions : techQsFallback,
+      hrQuestions: Array.isArray(parsed.hrQuestions) && parsed.hrQuestions.length ? parsed.hrQuestions : hrQsFallback,
+      feedback: typeof parsed.feedback === 'string' && parsed.feedback ? parsed.feedback : 'Assess candidate clarity, depth of technical reasoning, and problem-solving; score 1-5.',
+      difficultyBreakdown: (parsed.difficultyBreakdown && typeof parsed.difficultyBreakdown === 'object' && Object.keys(parsed.difficultyBreakdown).length) ? parsed.difficultyBreakdown : difficultyBreakdownFallback,
+      confidence: Number.isFinite(parsed.confidence) ? Math.max(0, Math.min(100, Number(parsed.confidence))) : 50
     };
   }
+  // Fallback deterministic interview kit generation
+  const techQs = [];
+  const hrQs = [
+    'Tell me about yourself and why you are interested in this role.',
+    'Describe a challenge you faced and how you resolved it.'
+  ];
+
+  const coreSkills = Array.isArray(skills) && skills.length ? skills.slice(0,5) : ['JavaScript','Data Structures','APIs'];
+  // Build 6 technical questions with varying difficulty
+  coreSkills.forEach((s, idx) => {
+    const difficulty = idx < 2 ? 'easy' : (idx < 4 ? 'medium' : 'hard');
+    techQs.push({ question: `Explain core concepts and common interview problems for ${s}.`, difficulty });
+  });
+
+  const difficultyBreakdown = { easy: 2, medium: 2, hard: techQs.length - 4 };
 
   return {
-    technicalQuestions: [],
-    hrQuestions: [],
-    feedback: String(raw || 'Model did not return valid JSON'),
-    difficultyBreakdown: { easy: 0, medium: 0, hard: 0 },
-    confidence: 0
+    technicalQuestions: techQs,
+    hrQuestions: hrQs,
+    feedback: 'Assess candidate clarity, depth of technical reasoning, and problem-solving; score 1-5.',
+    difficultyBreakdown,
+    confidence: 50
   };
 }
 

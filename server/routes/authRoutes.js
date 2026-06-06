@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { register, login } = require('../controllers/authController');
+const { register, login, googleLogin } = require('../controllers/authController');
 const validateRequest = require('../middleware/validateRequest');
 
 const router = express.Router();
@@ -24,4 +24,7 @@ router.post(
   login
 );
 
-module.exports = router;
+// Google OAuth login — no validation middleware needed (credential from Google)
+router.post('/google', googleLogin);
+
+module.exports = router;

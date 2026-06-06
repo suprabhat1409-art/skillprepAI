@@ -1,9 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 
 const User = require('../models/User');
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 function createToken(user) {
   return jwt.sign(
@@ -51,6 +53,7 @@ async function register(req, res) {
         id: user._id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar,
         skills: user.skills,
         targetRole: user.targetRole
       }
@@ -85,6 +88,7 @@ async function login(req, res) {
         id: user._id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar,
         skills: user.skills,
         targetRole: user.targetRole
       }
@@ -95,7 +99,72 @@ async function login(req, res) {
   }
 }
 
+async function googleLogin(req, res) {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ error: 'Google credential is required' });
+    }
+
+    // Verify the Google ID token
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture, email_verified } = payload;
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Ensure Google reports the email as verified before accepting login
+    if (!email_verified) {
+      return res.status(400).json({ error: 'Google account email is not verified' });
+    }
+
+    // Find existing user or create new one
+    let user = await User.findOne({ email: normalizedEmail });
+
+    if (user) {
+      // Update googleId and avatar if not set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.avatar = picture || user.avatar;
+        await user.save();
+      }
+    } else {
+      // Create new user from Google account (no password)
+      user = await User.create({
+        name: name || 'Google User',
+        email: normalizedEmail,
+        googleId,
+        avatar: picture || null,
+        skills: [],
+        targetRole: ''
+      });
+    }
+
+    const token = createToken(user);
+
+    return res.json({
+      message: 'Google login successful',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        skills: user.skills,
+        targetRole: user.targetRole
+      }
+    });
+  } catch (error) {
+    console.error('Google login error:', error);
+    return res.status(401).json({ error: 'Invalid Google token. Please try again.' });
+  }
+}
+
 module.exports = {
   register,
-  login
+  login,
+  googleLogin
 };
